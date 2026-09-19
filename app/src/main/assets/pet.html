@@ -9,6 +9,13 @@
     width: 100%; height: 100%; overflow: hidden;
   }
   .pet { width: 100%; height: 100%; position: relative; }
+  #whale {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    user-select: none; -webkit-user-drag: none;
+    animation: floaty 3s ease-in-out infinite;
+  }
+  @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
   #bubble {
     position: absolute; top: -4px; left: 60%;
     transform: translateX(-50%);
@@ -18,53 +25,27 @@
     max-width: 180px; display: none; box-shadow: 0 2px 8px rgba(0,0,0,.15);
     white-space: nowrap; z-index: 10;
   }
-  .tail { transform-origin: 30% 60%; }
-  .sleep .tail { animation: sway 1.6s ease-in-out infinite; }
-  @keyframes sway { 0%,100%{transform:rotate(0)} 50%{transform:rotate(9deg)} }
-  .blink { animation: blink 4s infinite; }
-  @keyframes blink { 0%,92%,100%{opacity:1} 94%,96%{opacity:0} }
-  .sway { animation: floaty 3s ease-in-out infinite; }
-  @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
 </style>
 </head>
 <body>
 <div class="pet" id="pet">
   <div id="bubble"></div>
-  <svg class="sway" viewBox="0 0 180 240" width="100%" height="100%">
-    <!-- 身体 -->
-    <ellipse cx="90" cy="160" rx="58" ry="40" fill="#4a7fc7"/>
-    <!-- 肚子 -->
-    <ellipse cx="90" cy="172" rx="36" ry="24" fill="#dcebf7"/>
-    <!-- 尾巴 -->
-    <g class="tail">
-      <path d="M145 160 Q170 140 172 118 Q166 146 150 160 Z" fill="#3a6bb0"/>
-    </g>
-    <!-- 鳍 -->
-    <path d="M55 148 Q36 140 32 158 Q48 164 58 162 Z" fill="#3a6bb0"/>
-    <!-- 喷水孔 -->
-    <ellipse cx="90" cy="120" rx="10" ry="5" fill="#3a6bb0"/>
-    <!-- 眼睛 -->
-    <g class="blink">
-      <circle cx="72" cy="150" r="8" fill="#1d2b3a"/>
-      <circle cx="70" cy="147" r="3" fill="#ffffff"/>
-    </g>
-    <circle cx="108" cy="150" r="8" fill="#1d2b3a"/>
-    <circle cx="106" cy="147" r="3" fill="#ffffff"/>
-    <!-- 腮红 -->
-    <ellipse cx="62" cy="162" rx="7" ry="4" fill="#f6a8c8" opacity=".6"/>
-    <ellipse cx="118" cy="162" rx="7" ry="4" fill="#f6a8c8" opacity=".6"/>
-    <!-- 嘴 -->
-    <path d="M78 162 Q90 170 102 162" stroke="#1d2b3a" stroke-width="2" fill="none"/>
-  </svg>
+  <img id="whale" src="whale/cool.png" alt="">
 </div>
 <script>
   var bubble = document.getElementById('bubble');
-  var pet = document.getElementById('pet');
-  // 与原生层通信的引擎
+  var whale = document.getElementById('whale');
+  var BASE = 'whale/';
+  var FACES = ['cool','normal','happy','smile','tail'];
+  function setFace(name){ whale.src = BASE + name + '.png'; }
   window.petEngine = {
-    onTap: function(){ say('戳我干嘛呀'); },
-    onDoubleTap: function(){ blush(); say('别戳啦，痒'); },
-    onLongPress: function(){ sleep(); },
+    onTap: function(){
+      var f = FACES[Math.floor(Math.random()*FACES.length)];
+      setFace(f);
+      say('戳我干嘛呀');
+    },
+    onDoubleTap: function(){ setFace('happy'); say('别戳啦，痒'); },
+    onLongPress: function(){ setFace('cool'); say('……'); },
     say: say,
     setState: setState
   };
@@ -73,9 +54,11 @@
     bubble.textContent=txt;
     setTimeout(function(){ bubble.style.display='none'; }, 2200);
   }
-  function blush(){ pet.classList.add('sway'); }
-  function sleep(){ pet.classList.add('sleep'); }
-  function setState(s){ if(s && s.speech_bubble){ say(s.speech_bubble); } }
+  function setState(s){
+    if(!s) return;
+    if(s.face){ setFace(s.face); }
+    if(s.speech_bubble){ say(s.speech_bubble); }
+  }
 </script>
 </body>
 </html>
