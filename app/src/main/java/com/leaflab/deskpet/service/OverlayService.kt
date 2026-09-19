@@ -1,6 +1,7 @@
 package com.leaflab.deskpet.service
 
 import android.app.*
+import androidx.core.app.NotificationCompat
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
